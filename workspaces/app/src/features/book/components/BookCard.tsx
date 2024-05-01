@@ -52,7 +52,7 @@ type Props = {
 
 const BookCard: React.FC<Props> = ({ book }) => {
 
-  const imageUrl = useImage({ height: 128, imageId: book.image.id, width: 192 });
+  const imageUrl = useImage({ format: 'webp', height: 128, imageId: book.image.id, width: 192 });
   const authorImageUrl = useImage({ height: 32, imageId: book.author.image.id, width: 32 });
 
   return (
