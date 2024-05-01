@@ -68,7 +68,7 @@ app.get(
   zValidator(
     'param',
     z.object({
-      imageFile: z.string().regex(/^[a-f0-9-]+(?:\.\w*)?$/),
+      imageFile: z.string(),
     }),
   ),
   zValidator(
@@ -88,6 +88,16 @@ app.get(
 
     if (!isSupportedImageFormat(resImgFormat)) {
       throw new HTTPException(501, { message: `Image format: ${resImgFormat} is not supported.` });
+    }
+
+    // webpの場合は変換済みの画像を返却する
+    if (resImgFormat === 'webp') {
+      c.header('Content-Type', IMAGE_MIME_TYPE[resImgFormat]);
+      const query = c.req.valid('query');
+      if (query.width == null && query.height == null) {
+        return c.body(createStreamBody(createReadStream(path.resolve(IMAGES_PATH, `${reqImgId}.webp`))));
+      }
+      return c.body(createStreamBody(createReadStream(path.resolve(IMAGES_PATH, `${reqImgId}-${query.width}x${query.height}.webp`))));
     }
 
     const origFileGlob = [path.resolve(IMAGES_PATH, `${reqImgId}`), path.resolve(IMAGES_PATH, `${reqImgId}.*`)];

@@ -34,7 +34,7 @@ type Props = {
 export const BookListItem: React.FC<Props> = ({ bookId }) => {
   const { data: book } = useBook({ params: { bookId } });
 
-  const imageUrl = useImage({ height: 64, imageId: book.image.id, width: 64 });
+  const imageUrl = useImage({ format: 'webp', height: 64, imageId: book.image.id, width: 64 });
 
   return (
     <_Wrapper>

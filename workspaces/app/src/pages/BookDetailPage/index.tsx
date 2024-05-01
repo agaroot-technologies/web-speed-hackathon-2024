@@ -54,7 +54,7 @@ const BookDetailPage: React.FC = () => {
 
   const [isFavorite, toggleFavorite] = useAtom(FavoriteBookAtomFamily(bookId));
 
-  const bookImageUrl = useImage({ height: 256, imageId: book.image.id, width: 192 });
+  const bookImageUrl = useImage({ format: 'webp', height: 256, imageId: book.image.id, width: 192 });
   const auhtorImageUrl = useImage({ height: 32, imageId: book.author.image.id, width: 32 });
 
   const handleFavClick = useCallback(() => {
