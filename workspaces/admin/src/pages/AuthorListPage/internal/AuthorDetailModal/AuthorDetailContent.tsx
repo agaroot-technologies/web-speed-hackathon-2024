@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import type { GetAuthorResponse } from '@wsh-2024/schema/src/api/authors/GetAuthorResponse';
 
 import { useDeleteAuthor } from '../../../../features/authors/hooks/useDeleteAuthor';
-import { getImageUrl } from '../../../../lib/image/getImageUrl';
+import { getImageSrc } from '../../../../lib/image/getImageSrc';
 
 type AuthorDetailContentProps = {
   author: GetAuthorResponse;
@@ -33,7 +33,7 @@ export const AuthorDetailContent: React.FC<AuthorDetailContentProps> = ({ author
   return (
     <Box aria-label="作者詳細" as="section">
       <Flex align="center" pb={2}>
-        <Avatar name={author.name} size="xl" src={getImageUrl({ format: 'webp', imageId: author.image.id })} />
+        <Avatar name={author.name} size="xl" {...getImageSrc({ imageId: author.image.id })} />
         <Stack p={4} spacing={2}>
           <StackItem>
             <Text fontWeight="bold">{author.name}</Text>
