@@ -3,8 +3,10 @@ import fs from 'node:fs/promises';
 import { Hono } from 'hono';
 
 import { INDEX_HTML_PATH } from '../../constants/paths';
+import { staticContentCacheMiddleware } from '../../middlewares/cacheControlMiddleware';
 
 const app = new Hono();
+app.use(staticContentCacheMiddleware);
 
 app.get('/admin', async (c) => {
   const html = await fs.readFile(INDEX_HTML_PATH, 'utf-8');

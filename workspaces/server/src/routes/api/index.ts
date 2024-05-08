@@ -11,8 +11,10 @@ import { imageApp } from './images';
 import { internalApp } from './internal';
 import { rankingApp } from './rankings';
 import { releaseApp } from './releases';
+import { cacheControlMiddleware } from '../../middlewares/cacheControlMiddleware';
 
 const app = new OpenAPIHono();
+app.use(cacheControlMiddleware);
 
 app.doc31('/api/v1/specification', {
   info: {

@@ -16,8 +16,10 @@ import { ClientApp } from '@wsh-2024/app/src/index';
 import { getDayOfWeekStr } from '@wsh-2024/app/src/lib/date/getDayOfWeekStr';
 
 import { INDEX_HTML_PATH } from '../../constants/paths';
+import { cacheControlMiddleware } from '../../middlewares/cacheControlMiddleware';
 
 const app = new Hono();
+app.use(cacheControlMiddleware);
 
 async function createInjectDataStr(): Promise<Record<string, unknown>> {
   const json: Record<string, unknown> = {};
