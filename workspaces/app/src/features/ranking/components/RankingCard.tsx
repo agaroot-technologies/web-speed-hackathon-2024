@@ -56,7 +56,7 @@ type Props = {
 
 const RankingCard: React.FC<Props> = ({ book }) => {
   const imageUrl = useImage({ format: 'webp', height: 96, imageId: book.image.id, width: 96 });
-  const authorImageUrl = useImage({ height: 32, imageId: book.author.image.id, width: 32 });
+  const authorImageUrl = useImage({ format: 'webp', height: 32, imageId: book.author.image.id, width: 32 });
 
   return (
     <_Wrapper>
