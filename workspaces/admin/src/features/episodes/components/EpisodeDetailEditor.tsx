@@ -27,7 +27,7 @@ import { encrypt } from '@wsh-2024/image-encrypt/src/encrypt';
 import type { GetBookResponse } from '@wsh-2024/schema/src/api/books/GetBookResponse';
 import type { GetEpisodeResponse } from '@wsh-2024/schema/src/api/episodes/GetEpisodeResponse';
 
-import { getImageUrl } from '../../../lib/image/getImageUrl';
+import { getImageSrc } from '../../../lib/image/getImageSrc';
 import { isSupportedImage } from '../../../lib/image/isSupportedImage';
 import { useCreateEpisode } from '../hooks/useCreateEpisode';
 import { useCreateEpisodePage } from '../hooks/useCreateEpisodePage';
@@ -278,13 +278,14 @@ export const EpisodeDetailEditor: React.FC<Props> = ({ book, episode }) => {
                   _groupHover={{ opacity: 0.75 }}
                   alt={episode?.image.id}
                   height={200}
-                  src={
-                    thumbnailUrl ??
-                    (episode != null
-                      ? getImageUrl({ format: 'jpg', height: 200, imageId: episode.image.id, width: 200 })
-                      : undefined)
-                  }
                   width={200}
+                  {...(thumbnailUrl
+                    ? {
+                        src: thumbnailUrl,
+                      }
+                    : episode != null
+                      ? getImageSrc({ height: 200, imageId: episode.image.id, width: 200 })
+                      : undefined)}
                 />
                 <Center
                   _groupFocusVisible={{ visibility: 'visible' }}
