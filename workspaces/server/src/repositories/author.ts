@@ -100,6 +100,9 @@ class AuthorRepository implements AuthorRepositoryInterface {
         limit: options.query.limit,
         offset: options.query.offset,
         where(author, { like }) {
+          if (options.query.authorId != null) {
+            return eq(author.id, options.query.authorId);
+          }
           if (options.query.name != null) {
             return like(author.name, `%${options.query.name}%`);
           }

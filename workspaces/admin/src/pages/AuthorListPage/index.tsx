@@ -18,12 +18,14 @@ import {
   Tr,
 } from '@chakra-ui/react';
 import { useFormik } from 'formik';
-import { useId, useMemo, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
+import { useDebounce } from 'react-use';
 import _ from 'underscore';
 import { create } from 'zustand';
 
+import type { GetAuthorListRequestQuery } from '@wsh-2024/schema/src/api/authors/GetAuthorListRequestQuery';
+
 import { useAuthorList } from '../../features/authors/hooks/useAuthorList';
-import { isContains } from '../../lib/filter/isContains';
 
 import { AuthorDetailModal } from './internal/AuthorDetailModal';
 import { CreateAuthorModal } from './internal/CreateAuthorModal';
@@ -62,9 +64,6 @@ type AuthorModalAction = {
 };
 
 export const AuthorListPage: React.FC = () => {
-  const { data: authorList = [] } = useAuthorList();
-  const authorListA11yId = useId();
-
   const formik = useFormik({
     initialValues: {
       kind: AuthorSearchKind.AuthorId as AuthorSearchKind,
@@ -73,26 +72,34 @@ export const AuthorListPage: React.FC = () => {
     onSubmit() {},
   });
 
-  const filteredAuthorList = useMemo(() => {
-    if (formik.values.query === '') {
-      return authorList;
+  const [query, setQuery] = useState<GetAuthorListRequestQuery>({});
+  
+  const updateQuery = useCallback((kind: AuthorSearchKind, query: string) => {
+    if (!query) {
+      return setQuery({});
     }
-
-    switch (formik.values.kind) {
+    switch (kind) {
       case AuthorSearchKind.AuthorId: {
-        return authorList.filter((author) => author.id === formik.values.query);
+        return setQuery({ authorId: query });
       }
       case AuthorSearchKind.AuthorName: {
-        return authorList.filter((author) => {
-          return isContains({ query: formik.values.query, target: author.name });
-        });
-      }
-      default: {
-        formik.values.kind satisfies never;
-        return authorList;
+        return setQuery({ name: query });
       }
     }
-  }, [formik.values.kind, formik.values.query, authorList]);
+  }, []);
+
+  useEffect(() => {
+    updateQuery(formik.values.kind, formik.values.query);
+  // 検索種別は即時反映したいのでkindだけdepsに指定している
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [updateQuery, formik.values.kind]);
+
+  useDebounce(() => {
+    updateQuery(formik.values.kind, formik.values.query);
+  }, 250, [updateQuery, formik.values.query]);
+
+  const { data: authorList = [] } = useAuthorList(query);
+  const authorListA11yId = useId();
 
   const [useModalStore] = useState(() => {
     return create<AuthorModalState & AuthorModalAction>()((set) => ({
@@ -184,7 +191,7 @@ export const AuthorListPage: React.FC = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {_.map(filteredAuthorList, (author) => (
+                {_.map(authorList, (author) => (
                   <Tr key={author.id}>
                     <Td textAlign="center" verticalAlign="middle">
                       <Button colorScheme="teal" onClick={() => modalState.openDetail(author.id)} variant="solid">
