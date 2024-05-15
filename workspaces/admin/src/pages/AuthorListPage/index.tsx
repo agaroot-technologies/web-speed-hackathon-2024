@@ -20,7 +20,6 @@ import {
 import { useFormik } from 'formik';
 import { useCallback, useEffect, useId, useState } from 'react';
 import { useDebounce } from 'react-use';
-import _ from 'underscore';
 import { create } from 'zustand';
 
 import type { GetAuthorListRequestQuery } from '@wsh-2024/schema/src/api/authors/GetAuthorListRequestQuery';
@@ -73,7 +72,7 @@ export const AuthorListPage: React.FC = () => {
   });
 
   const [query, setQuery] = useState<GetAuthorListRequestQuery>({});
-  
+
   const updateQuery = useCallback((kind: AuthorSearchKind, query: string) => {
     if (!query) {
       return setQuery({});
@@ -191,7 +190,7 @@ export const AuthorListPage: React.FC = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {_.map(authorList, (author) => (
+                {authorList.map((author) => (
                   <Tr key={author.id}>
                     <Td textAlign="center" verticalAlign="middle">
                       <Button colorScheme="teal" onClick={() => modalState.openDetail(author.id)} variant="solid">
