@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { aliasedTable, eq, like, or } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 import { err, ok } from 'neverthrow';
 import type { Result } from 'neverthrow';
@@ -14,7 +14,7 @@ import type { PatchBookRequestParams } from '@wsh-2024/schema/src/api/books/Patc
 import type { PatchBookResponse } from '@wsh-2024/schema/src/api/books/PatchBookResponse';
 import type { PostBookRequestBody } from '@wsh-2024/schema/src/api/books/PostBookRequestBody';
 import type { PostBookResponse } from '@wsh-2024/schema/src/api/books/PostBookResponse';
-import { author, book, episode, episodePage, feature, ranking } from '@wsh-2024/schema/src/models';
+import { author, book, episode, episodePage, feature, ranking, image } from '@wsh-2024/schema/src/models';
 
 import { getDatabase } from '../database/drizzle';
 
@@ -86,64 +86,101 @@ class BookRepository implements BookRepositoryInterface {
 
   async readAll(options: { query: GetBookListRequestQuery }): Promise<Result<GetBookListResponse, HTTPException>> {
     try {
-      const data = await getDatabase().query.book.findMany({
-        columns: {
-          description: true,
-          id: true,
-          name: true,
-          nameRuby: true,
-        },
-        limit: options.query.limit,
-        offset: options.query.offset,
-        orderBy(book, { asc }) {
-          return asc(book.createdAt);
-        },
-        where(book, { eq, like, or }) {
-          if (options.query.authorId != null) {
-            return eq(book.authorId, options.query.authorId);
-          }
-          if (options.query.authorName != null) {
-            return like(author.name, `%${options.query.authorName}%`);
-          }
-          if (options.query.name != null) {
-            return or(
-              like(book.name, `%${options.query.name}%`),
-              like(book.nameRuby, `%${options.query.name}%`)
-            );
-          }
-          return;
-        },
-        with: {
-          author: {
-            columns: {
-              description: true,
-              id: true,
-              name: true,
-            },
-            with: {
-              image: {
-                columns: {
-                  alt: true,
-                  id: true,
-                },
-              },
-            },
-          },
-          episodes: {
-            columns: {
-              id: true,
-            },
-          },
-          image: {
-            columns: {
-              alt: true,
-              id: true,
-            },
-          },
-        },
-      });
+      const [bookImage, authorImage] = [
+        aliasedTable(image, 'book_images'),
+        aliasedTable(image, 'author_images'),
+      ];
 
-      return ok(data);
+      const baseQuery = getDatabase()
+        .select({
+          description: book.description,
+          id: book.id,
+          name: book.name,
+          nameRuby: book.nameRuby,
+          author: {
+            description: author.description,
+            id: author.id,
+            name: author.name,
+            
+          },
+          authorImage: {
+            alt: authorImage.alt,
+            id: authorImage.id,
+          },
+          episode: {
+            id: episode.id,
+          },
+          bookImage: {
+            alt: bookImage.alt,
+            id: bookImage.id,
+          },
+        })
+        .from(book)
+        .innerJoin(
+          author,
+          eq(author.id, book.authorId),
+        )
+        .innerJoin(
+          authorImage,
+          eq(authorImage.id, author.imageId),
+        )
+        .innerJoin(
+          episode,
+          eq(episode.bookId, book.id),
+        )
+        .innerJoin(
+          bookImage,
+          eq(bookImage.id, book.imageId),
+        )
+        .orderBy(
+          book.createdAt,
+        )
+        .$dynamic();
+
+      const results = await (() => {
+        if (options.query.authorId != null) {
+          return baseQuery.where(eq(book.authorId, options.query.authorId))
+        }
+        if (options.query.authorName != null) {
+          return baseQuery.where(like(author.name, `%${options.query.authorName}%`))
+        }
+        if (options.query.bookId != null) {
+          return baseQuery.where(eq(book.id, options.query.bookId))
+        }
+        if (options.query.name != null) {
+          return baseQuery.where(or(
+            like(book.name, `%${options.query.name}%`),
+            like(book.nameRuby, `%${options.query.name}%`)
+          ))
+        }
+        return baseQuery;
+      })();
+
+      const data = results.reduce<Record<string, GetBookListResponse[number]>>((previous, current) => {
+        const book = previous[current.id];
+        if (book) {
+          if (book.episodes) {
+            book.episodes.push(current.episode);
+          }
+        } else {
+          previous[current.id] = {
+            description: current.description,
+            id: current.id,
+            name: current.name,
+            nameRuby: current.nameRuby,
+            episodes: [current.episode],
+            author: {
+              ...current.author,
+              image: current.authorImage,
+            },
+            image: current.bookImage,
+          }
+        }
+
+        return previous;
+      }, {});
+
+      return ok(Object.values(data));
     } catch (cause) {
       if (cause instanceof HTTPException) {
         return err(cause);
