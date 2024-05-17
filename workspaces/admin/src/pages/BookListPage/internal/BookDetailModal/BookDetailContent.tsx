@@ -3,7 +3,6 @@ import { useCallback } from 'react';
 
 import type { GetBookResponse } from '@wsh-2024/schema/src/api/books/GetBookResponse';
 
-import { useBookList } from '../../../../features/books/hooks/useBookList';
 import { useDeleteBook } from '../../../../features/books/hooks/useDeleteBook';
 import { getImageSrc } from '../../../../lib/image/getImageSrc';
 
@@ -14,7 +13,6 @@ type BookDetailContentProps = {
 };
 
 export const BookDetailContent: React.FC<BookDetailContentProps> = ({ book, onCloseDialog, onEdit }) => {
-  const { refetch: refetchBookList } = useBookList();
   const { mutate: deleteBook } = useDeleteBook();
 
   const handleEditClick = useCallback(() => {
@@ -28,12 +26,11 @@ export const BookDetailContent: React.FC<BookDetailContentProps> = ({ book, onCl
       },
       {
         onSuccess: () => {
-          refetchBookList();
           onCloseDialog();
         },
       },
     );
-  }, [book, deleteBook, onCloseDialog, refetchBookList]);
+}, [book, deleteBook, onCloseDialog]);
 
   return (
     <Box aria-label="作品詳細" as="section">
