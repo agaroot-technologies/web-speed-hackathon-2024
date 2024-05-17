@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import { styled } from 'styled-components';
 
 import { Flex } from '../../../foundation/components/Flex';
@@ -60,7 +59,7 @@ type Props = {
   };
 };
 
-const FeatureCard: React.FC<Props> = ({ book }) => {
+export const FeatureCard: React.FC<Props> = ({ book }) => {
   return (
     <_Wrapper href={`/books/${book.id}`}>
       <_ImgWrapper>
@@ -98,13 +97,3 @@ const FeatureCard: React.FC<Props> = ({ book }) => {
     </_Wrapper>
   );
 };
-
-const FeatureCardWithSuspense: React.FC<Props> = (props) => {
-  return (
-    <Suspense fallback={null}>
-      <FeatureCard {...props} />
-    </Suspense>
-  );
-};
-
-export { FeatureCardWithSuspense as FeatureCard };
