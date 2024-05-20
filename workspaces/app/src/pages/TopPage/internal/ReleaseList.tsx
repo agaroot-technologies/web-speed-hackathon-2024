@@ -1,4 +1,3 @@
-import moment from 'moment-timezone';
 import { Suspense, useId } from 'react';
 import type { FC } from 'react';
 
@@ -12,7 +11,7 @@ import { Color, Space, Typography } from '../../../foundation/styles/variables';
 import { getDayOfWeekStr } from '../../../lib/date/getDayOfWeekStr';
 
 const ReleaseList: FC = () => {
-  const todayStr = getDayOfWeekStr(moment());
+  const todayStr = getDayOfWeekStr(new Date());
   const { data: release } = useRelease({ params: { dayOfWeek: todayStr } });
 
   return (
