@@ -326,9 +326,6 @@ importers:
       jsdom:
         specifier: 24.0.0
         version: 24.0.0
-      jsesc:
-        specifier: 3.0.2
-        version: 3.0.2
       log4js:
         specifier: 6.9.1
         version: 6.9.1
@@ -353,9 +350,6 @@ importers:
       styled-components:
         specifier: 6.1.1
         version: 6.1.1(react-dom@18.2.0)(react@18.2.0)
-      swr:
-        specifier: 2.2.4
-        version: 2.2.4(react@18.2.0)
       zod:
         specifier: 3.22.4
         version: 3.22.4
@@ -366,9 +360,6 @@ importers:
       '@types/better-sqlite3':
         specifier: 7.6.8
         version: 7.6.8
-      '@types/jsesc':
-        specifier: 3.0.3
-        version: 3.0.3
       '@types/node':
         specifier: 20.9.0
         version: 20.9.0
@@ -3566,10 +3557,6 @@ packages:
   /@types/js-cookie@2.2.7:
     resolution: {integrity: sha512-aLkWa0C0vO5b4Sr798E26QgOkss68Un0bLjs7u9qxzPT5CG+8DuNTffWES58YzJs3hrVAOs1wonycqEBqNJubA==}
     dev: false
-
-  /@types/jsesc@3.0.3:
-    resolution: {integrity: sha512-YZZ9ZOAiiSVC6KApWd/fTCDTdTOOMiRU4Lq3/VSmXNPse8IvCVOn5kYRRLu900Ub1lTPurVZFI5unEqLDJR7wg==}
-    dev: true
 
   /@types/json-schema@7.0.15:
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -6954,6 +6941,7 @@ packages:
     resolution: {integrity: sha512-xKqzzWXDttJuOcawBt4KnKHHIf5oQ/Cxax+0PWFG+DFDgHNAdi+TXECADI+RYiFUMmx8792xsMbbgXj4CwnP4g==}
     engines: {node: '>=6'}
     hasBin: true
+    dev: true
 
   /json-buffer@3.0.1:
     resolution: {integrity: sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==}
