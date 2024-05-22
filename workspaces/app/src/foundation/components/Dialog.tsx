@@ -1,11 +1,10 @@
 import { Close } from '@mui/icons-material'
-import { useAtom } from 'jotai';
 import styled from 'styled-components';
 
-import { DialogContentAtom } from '../atoms/DialogContentAtom';
 import { Color, Space } from '../styles/variables';
 
 import { Button } from './Button';
+import { useState } from 'react';
 
 const _Overlay = styled.div`
   position: fixed;
@@ -35,6 +34,10 @@ const _Container = styled.div`
   overflow: scroll;
 `;
 
+const _Button = styled(Button)`
+  color: ${Color.MONO_A};
+`;
+
 const _CloseButton = styled(Button)`
   border-radius: 50%;
   height: 32px;
@@ -44,17 +47,40 @@ const _CloseButton = styled(Button)`
   left: -${Space * 1}px;
 `;
 
-export const Dialog: React.FC = () => {
-  const [content, updateContent] = useAtom(DialogContentAtom);
+export const Dialog: React.FC<{
+  label: string
+  content: JSX.Element
+}> = ({
+  label,
+  content
+}) => {
+  const [open, setOpen] = useState(false)
 
-  return content != null ? (
-    <_Overlay>
-      <_Wrapper>
-        <_CloseButton onClick={() => updateContent(null)}>
-          <Close style={{ color: Color.MONO_A, height: 32, width: 32 }} />
-        </_CloseButton>
-        <_Container>{content}</_Container>
-      </_Wrapper>
-    </_Overlay>
-  ) : null;
+  const handleOpen = () => {
+    document.body.style.overflow = 'hidden'
+    setOpen(true)
+  }
+
+  const handleClose = () => {
+    document.body.style.overflow = 'scroll'
+    setOpen(false)
+  }
+
+  return (
+    <>
+    <_Button onClick={handleOpen}>
+      {label}
+    </_Button>
+    {open &&
+      <_Overlay>
+        <_Wrapper>
+          <_CloseButton onClick={handleClose}>
+            <Close style={{ color: Color.MONO_A, height: 32, width: 32 }} />
+          </_CloseButton>
+          <_Container>{content}</_Container>
+        </_Wrapper>
+      </_Overlay>
+    }
+    </>
+  )
 };
