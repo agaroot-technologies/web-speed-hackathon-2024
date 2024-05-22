@@ -24,7 +24,6 @@
     "hono": "4.1.0",
     "image-js": "0.35.5",
     "jsdom": "24.0.0",
-    "jsesc": "3.0.2",
     "log4js": "6.9.1",
     "neverthrow": "6.1.0",
     "pkg-dir": "5.0.0",
@@ -33,13 +32,11 @@
     "react-router-dom": "6.18.0",
     "sharp": "0.33.2",
     "styled-components": "6.1.1",
-    "swr": "2.2.4",
     "zod": "3.22.4"
   },
   "devDependencies": {
     "@types/bcryptjs": "2.4.6",
     "@types/better-sqlite3": "7.6.8",
-    "@types/jsesc": "3.0.3",
     "@types/node": "20.9.0",
     "@types/react": "18.2.0",
     "@types/react-dom": "18.2.1",
