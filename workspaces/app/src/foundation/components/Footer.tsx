@@ -20,20 +20,28 @@ export const Footer: React.FC = () => {
   const companyDialogA11yId = useId();
   const overviewDialogA11yId = useId();
 
-  const [term, setTerm] = useState<string>("")
-  const [contact, setContact] = useState<string>("")
-  const [question, setQuestion] = useState<string>("")
-  const [company, setCompany] = useState<string>("")
-  const [overview, setOverview] = useState<string>("")
+
+  type ContentKeys = 'term' | 'contact' | 'question' | 'company' | 'overview'
+  const [contents, setContents] = useState<Record<ContentKeys, string>>({
+    term: '',
+    contact: '',
+    question: '',
+    company: '',
+    overview: '',
+  })
+
   useEffect(() => {
     const fetchContent = async () => {
       await Promise.all([
-        fetch('/assets/term.txt').then((res) => res.text()).then(setTerm),
-        fetch('/assets/contact.txt').then((res) => res.text()).then(setContact),
-        fetch('/assets/question.txt').then((res) => res.text()).then(setQuestion),
-        fetch('/assets/company.txt').then((res) => res.text()).then(setCompany),
-        fetch('/assets/overview.txt').then((res) => res.text()).then(setOverview),
+        fetch('/assets/term.txt').then((res) => res.text()),
+        fetch('/assets/contact.txt').then((res) => res.text()),
+        fetch('/assets/question.txt').then((res) => res.text()),
+        fetch('/assets/company.txt').then((res) => res.text()),
+        fetch('/assets/overview.txt').then((res) => res.text()),
       ])
+      .then(([term, contact, question, company, overview]) => {
+        setContents({ term, contact, question, company, overview })
+      })
     }
 
     fetchContent()
@@ -47,13 +55,14 @@ export const Footer: React.FC = () => {
           <Dialog
             label="利用規約"
             content={
+              // FIXME: ContentはDialog側に持たせるべき
               <_Content aria-labelledby={termDialogA11yId} role="dialog">
                 <Text as="h2" color={Color.MONO_100} id={termDialogA11yId} typography={Typography.NORMAL16}>
                   利用規約
                 </Text>
                 <Spacer height={Space * 1} />
                 <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-                  {term}
+                  {contents.term}
                 </Text>
               </_Content>
             }
@@ -67,7 +76,7 @@ export const Footer: React.FC = () => {
                 </Text>
                 <Spacer height={Space * 1} />
                 <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-                  {contact}
+                  {contents.contact}
                 </Text>
               </_Content>
             }
@@ -81,7 +90,7 @@ export const Footer: React.FC = () => {
                 </Text>
                 <Spacer height={Space * 1} />
                 <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-                  {question}
+                  {contents.question}
                 </Text>
               </_Content>
             }
@@ -95,7 +104,7 @@ export const Footer: React.FC = () => {
                 </Text>
                 <Spacer height={Space * 1} />
                 <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-                  {company}
+                  {contents.company}
                 </Text>
               </_Content>
             }
@@ -109,7 +118,7 @@ export const Footer: React.FC = () => {
                 </Text>
                 <Spacer height={Space * 1} />
                 <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-                  {overview}
+                  {contents.overview}
                 </Text>
               </_Content>
             }
