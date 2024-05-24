@@ -39,7 +39,6 @@ type Props = {
       };
       name: string;
     };
-    description: string;
     id: string;
     image: {
       alt: string;
