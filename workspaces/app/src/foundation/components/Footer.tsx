@@ -31,17 +31,15 @@ export const Footer: React.FC = () => {
   })
 
   useEffect(() => {
+    // NOTE: Promise.allで取得するとコネクションを占有してしまいほかのリソースの取得が遅れるため、直列で取得する
     const fetchContent = async () => {
-      await Promise.all([
-        fetch('/assets/term.txt').then((res) => res.text()),
-        fetch('/assets/contact.txt').then((res) => res.text()),
-        fetch('/assets/question.txt').then((res) => res.text()),
-        fetch('/assets/company.txt').then((res) => res.text()),
-        fetch('/assets/overview.txt').then((res) => res.text()),
-      ])
-      .then(([term, contact, question, company, overview]) => {
-        setContents({ term, contact, question, company, overview })
-      })
+      const term = await fetch('/assets/term.txt', {priority: "low"}).then((res) => res.text());
+      const contact = await fetch('/assets/contact.txt', {priority: "low"}).then((res) => res.text());
+      const question = await fetch('/assets/question.txt', {priority: "low"}).then((res) => res.text());
+      const company = await fetch('/assets/company.txt', {priority: "low"}).then((res) => res.text());
+      const overview = await fetch('/assets/overview.txt', {priority: "low"}).then((res) => res.text());
+
+      setContents({ term, contact, question, company, overview })
     }
 
     fetchContent()

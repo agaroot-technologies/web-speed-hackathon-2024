@@ -14,6 +14,7 @@ import { Spacer } from '../../foundation/components/Spacer';
 import { Text } from '../../foundation/components/Text';
 import { Color, Space, Typography } from '../../foundation/styles/variables';
 import { getImageSrc } from '../../lib/image/getImageSrc';
+import { useBookList } from '../../features/book/hooks/useBookList';
 
 const _HeadingWrapper = styled.section`
   display: grid;
@@ -36,6 +37,7 @@ const AuthorDetailPage: React.FC = () => {
   invariant(authorId);
 
   const { data: author } = useAuthor({ params: { authorId } });
+  const { data: books} = useBookList({query: {authorId}})
 
   const bookListA11yId = useId();
 
@@ -72,10 +74,10 @@ const AuthorDetailPage: React.FC = () => {
         <Spacer height={Space * 2} />
 
         <Flex align="center" as="ul" direction="column" justify="center">
-          {author.books.map((book) => (
+          {books.map((book) => (
             <BookListItem key={book.id} book={book} />
           ))}
-          {author.books.length === 0 && (
+          {books.length === 0 && (
             <>
               <Spacer height={Space * 2} />
               <Text color={Color.MONO_100} typography={Typography.NORMAL14}>
