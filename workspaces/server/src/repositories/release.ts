@@ -7,6 +7,7 @@ import type { GetReleaseRequestParams } from '@wsh-2024/schema/src/api/releases/
 import type { GetReleaseResponse } from '@wsh-2024/schema/src/api/releases/GetReleaseResponse';
 
 import { getDatabase } from '../database/drizzle';
+import { GetReleaseRequestQuery } from '@wsh-2024/schema/src/api/releases/GetReleaseRequestQuery';
 
 type ReleaseRepositoryInterface = {
   read(options: { params: GetReleaseRequestParams }): Promise<Result<GetReleaseResponse, HTTPException>>;
@@ -32,50 +33,54 @@ class ReleaseRepository implements ReleaseRepositoryInterface {
     }
   }
 
-  async read(options: { params: GetReleaseRequestParams }): Promise<Result<GetReleaseResponse, HTTPException>> {
+  async read(options: { params: GetReleaseRequestParams, query: GetReleaseRequestQuery }): Promise<Result<GetReleaseResponse, HTTPException>> {
     try {
-      const data = await getDatabase().query.release.findFirst({
+      const release = await getDatabase().query.release.findFirst({
         columns: {
           dayOfWeek: true,
           id: true,
         },
-        where(release, { eq }) {
+        where: (release, { eq }) => {
           return eq(release.dayOfWeek, options.params.dayOfWeek);
         },
+      });
+      if (release == null) {
+        throw new HTTPException(404, { message: `Release:${options.params.dayOfWeek} is not found` });
+      }
+
+      const books = await getDatabase().query.book.findMany({
+        columns: {
+          id: true,
+          name: true,
+        },
+        limit: options.query.limit,
+        offset: options.query.offset,
+        where(book, { eq }) {
+          return eq(book.releaseId, release.id);
+        },
         with: {
-          books: {
+          author: {
             columns: {
-              id: true,
               name: true,
             },
             with: {
-              author: {
-                columns: {
-                  name: true,
-                },
-                with: {
-                  image: {
-                    columns: {
-                      id: true,
-                    },
-                  },
-                },
-              },
               image: {
                 columns: {
-                  alt: true,
                   id: true,
                 },
               },
             },
           },
+          image: {
+            columns: {
+              alt: true,
+              id: true,
+            },
+          },
         },
       });
 
-      if (data == null) {
-        throw new HTTPException(404, { message: `Release:${options.params.dayOfWeek} is not found` });
-      }
-      return ok(data);
+      return ok({ ...release, books });
     } catch (cause) {
       if (cause instanceof HTTPException) {
         return err(cause);

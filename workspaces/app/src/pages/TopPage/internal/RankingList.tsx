@@ -1,4 +1,4 @@
-import { Suspense, useId } from 'react';
+import { Suspense, useId, useRef } from 'react';
 import type { FC } from 'react';
 
 import { RankingCard } from '../../../features/ranking/components/RankingCard';
@@ -7,16 +7,29 @@ import { Box } from '../../../foundation/components/Box';
 import { Flex } from '../../../foundation/components/Flex';
 import { Spacer } from '../../../foundation/components/Spacer';
 import { Text } from '../../../foundation/components/Text';
+import { useInViewPort } from '../../../foundation/hooks/useInViewPort';
 import { Color, Space, Typography } from '../../../foundation/styles/variables';
 
+const PAGE_SIZE = 10;
+
 const RankingList: FC = () => {
-  const { data: rankingList } = useRankingList({ query: {} });
+  const { data, isValidating, setSize, size } = useRankingList(PAGE_SIZE);
+  const rankingList = data?.flat() ?? [];
+  const isReachingEnd = (data?.at(-1)?.length ?? 0) < PAGE_SIZE;
+
+  const anchorRef = useRef<HTMLDivElement>(null);
+  useInViewPort(anchorRef, async entry => {
+    if (!entry.isIntersecting || isValidating || isReachingEnd) return;
+
+    setSize(size + 1);
+  });
 
   return (
     <Flex align="center" as="ul" direction="column" justify="center">
       {rankingList.map((ranking) => (
         <RankingCard key={ranking.id} book={ranking.book} />
       ))}
+      <div ref={anchorRef} style={{ minHeight: '1px', minWidth: '100%', opacity: 0 }} />
     </Flex>
   );
 };
