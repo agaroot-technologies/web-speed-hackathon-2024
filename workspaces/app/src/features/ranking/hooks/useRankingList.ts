@@ -1,7 +1,11 @@
-import useSWR from 'swr';
+import useSWRInfinite from 'swr/infinite';
 
 import { rankingApiClient } from '../apiClient/rankingApiClient';
 
-export function useRankingList(...[options]: Parameters<typeof rankingApiClient.fetchList>) {
-  return useSWR(rankingApiClient.fetchList$$key(options), rankingApiClient.fetchList, { suspense: true });
+export function useRankingList(limit: number) {
+  return useSWRInfinite(
+    index => rankingApiClient.fetchList$$key({ query: { limit, offset: index * limit }}),
+    rankingApiClient.fetchList,
+    { suspense: true },
+  );
 }
