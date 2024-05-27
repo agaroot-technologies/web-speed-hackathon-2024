@@ -24,7 +24,6 @@ import { useEffect, useRef, useState } from 'react';
 import * as yup from 'yup';
 
 import { encrypt } from '@wsh-2024/image-encrypt/src/encrypt';
-import type { GetBookResponse } from '@wsh-2024/schema/src/api/books/GetBookResponse';
 import type { GetEpisodeResponse } from '@wsh-2024/schema/src/api/episodes/GetEpisodeResponse';
 
 import { getImageSrc } from '../../../lib/image/getImageSrc';
@@ -38,11 +37,11 @@ import { useUpdateEpisode } from '../hooks/useUpdateEpisode';
 import { ComicPageImage } from './ComicPageImage';
 
 type Props = {
-  book: GetBookResponse;
+  bookId: string;
   episode?: GetEpisodeResponse;
 };
 
-export const EpisodeDetailEditor: React.FC<Props> = ({ book, episode }) => {
+export const EpisodeDetailEditor: React.FC<Props> = ({ bookId, episode }) => {
   const navigate = useNavigate();
 
   const { mutate: createEpisode } = useCreateEpisode();
@@ -63,7 +62,7 @@ export const EpisodeDetailEditor: React.FC<Props> = ({ book, episode }) => {
       if (episode == null) {
         return createEpisode(
           {
-            bookId: book.id,
+            bookId,
             chapter: values.chapter!,
             description: values.description!,
             image: values.image!,
@@ -73,7 +72,7 @@ export const EpisodeDetailEditor: React.FC<Props> = ({ book, episode }) => {
           {
             onSuccess(episode) {
               navigate({
-                params: { bookId: book.id, episodeId: episode.id },
+                params: { bookId, episodeId: episode.id },
                 to: '/admin/books/$bookId/episodes/$episodeId',
               });
             },
@@ -81,7 +80,7 @@ export const EpisodeDetailEditor: React.FC<Props> = ({ book, episode }) => {
         );
       } else {
         return updateEpisode({
-          bookId: book.id,
+          bookId,
           chapter: values.chapter,
           description: values.description,
           episodeId: episode.id,
@@ -121,7 +120,7 @@ export const EpisodeDetailEditor: React.FC<Props> = ({ book, episode }) => {
     if (episode == null) return;
     deleteEpisode(
       {
-        bookId: book.id,
+        bookId,
         episodeId: episode.id,
       },
       {
@@ -360,7 +359,7 @@ export const EpisodeDetailEditor: React.FC<Props> = ({ book, episode }) => {
             </FormControl>
             <Box>
               <Text fontWeight="bold">エピソードが含まれる作品 ID</Text>
-              <Text color="gray.600">{book.id}</Text>
+              <Text color="gray.600">{bookId}</Text>
             </Box>
             <Box display="flex" gap={4} justifyContent="flex-end">
               <Button
