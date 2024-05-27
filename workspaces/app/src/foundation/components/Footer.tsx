@@ -20,26 +20,20 @@ export const Footer: React.FC = () => {
   const companyDialogA11yId = useId();
   const overviewDialogA11yId = useId();
 
-
-  type ContentKeys = 'term' | 'contact' | 'question' | 'company' | 'overview'
-  const [contents, setContents] = useState<Record<ContentKeys, string>>({
-    term: '',
-    contact: '',
-    question: '',
-    company: '',
-    overview: '',
-  })
+  const [term, setTerm] = useState<string>("")
+  const [contact, setContact] = useState<string>("")
+  const [question, setQuestion] = useState<string>("")
+  const [company, setCompany] = useState<string>("")
+  const [overview, setOverview] = useState<string>("")
 
   useEffect(() => {
     // NOTE: Promise.allで取得するとコネクションを占有してしまいほかのリソースの取得が遅れるため、直列で取得する
     const fetchContent = async () => {
-      const term = await fetch('/assets/term.txt', {priority: "low"}).then((res) => res.text());
-      const contact = await fetch('/assets/contact.txt', {priority: "low"}).then((res) => res.text());
-      const question = await fetch('/assets/question.txt', {priority: "low"}).then((res) => res.text());
-      const company = await fetch('/assets/company.txt', {priority: "low"}).then((res) => res.text());
-      const overview = await fetch('/assets/overview.txt', {priority: "low"}).then((res) => res.text());
-
-      setContents({ term, contact, question, company, overview })
+      await fetch('/assets/term.txt', {priority: "low"}).then((res) => res.text()).then(setTerm);
+      await fetch('/assets/contact.txt', {priority: "low"}).then((res) => res.text()).then(setContact);
+      await fetch('/assets/question.txt', {priority: "low"}).then((res) => res.text()).then(setQuestion);
+      await fetch('/assets/company.txt', {priority: "low"}).then((res) => res.text()).then(setCompany);
+      await fetch('/assets/overview.txt', {priority: "low"}).then((res) => res.text()).then(setOverview);
     }
 
     fetchContent()
@@ -60,7 +54,7 @@ export const Footer: React.FC = () => {
                 </Text>
                 <Spacer height={Space * 1} />
                 <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-                  {contents.term}
+                  {term}
                 </Text>
               </_Content>
             }
@@ -74,7 +68,7 @@ export const Footer: React.FC = () => {
                 </Text>
                 <Spacer height={Space * 1} />
                 <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-                  {contents.contact}
+                  {contact}
                 </Text>
               </_Content>
             }
@@ -88,7 +82,7 @@ export const Footer: React.FC = () => {
                 </Text>
                 <Spacer height={Space * 1} />
                 <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-                  {contents.question}
+                  {question}
                 </Text>
               </_Content>
             }
@@ -102,7 +96,7 @@ export const Footer: React.FC = () => {
                 </Text>
                 <Spacer height={Space * 1} />
                 <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-                  {contents.company}
+                  {company}
                 </Text>
               </_Content>
             }
@@ -116,7 +110,7 @@ export const Footer: React.FC = () => {
                 </Text>
                 <Spacer height={Space * 1} />
                 <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-                  {contents.overview}
+                  {overview}
                 </Text>
               </_Content>
             }
