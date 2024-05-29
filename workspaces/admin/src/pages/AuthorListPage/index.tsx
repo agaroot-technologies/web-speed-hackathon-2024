@@ -61,6 +61,23 @@ type AuthorModalAction = {
   openCreate: () => void;
   openDetail: (authorId: string) => void;
 };
+const useModalStore = create<AuthorModalState & AuthorModalAction>()((set) => ({
+  ...{
+    mode: AuthorModalMode.None,
+    params: {},
+  },
+  ...{
+    close() {
+      set({ mode: AuthorModalMode.None, params: {} });
+    },
+    openCreate() {
+      set({ mode: AuthorModalMode.Create, params: {} });
+    },
+    openDetail(authorId) {
+      set({ mode: AuthorModalMode.Detail, params: { authorId } });
+    },
+  },
+}));
 
 export const AuthorListPage: React.FC = () => {
   const formik = useFormik({
@@ -100,25 +117,6 @@ export const AuthorListPage: React.FC = () => {
   const { data: authorList = [] } = useAuthorList(query);
   const authorListA11yId = useId();
 
-  const [useModalStore] = useState(() => {
-    return create<AuthorModalState & AuthorModalAction>()((set) => ({
-      ...{
-        mode: AuthorModalMode.None,
-        params: {},
-      },
-      ...{
-        close() {
-          set({ mode: AuthorModalMode.None, params: {} });
-        },
-        openCreate() {
-          set({ mode: AuthorModalMode.Create, params: {} });
-        },
-        openDetail(authorId) {
-          set({ mode: AuthorModalMode.Detail, params: { authorId } });
-        },
-      },
-    }));
-  });
   const modalState = useModalStore();
 
   return (

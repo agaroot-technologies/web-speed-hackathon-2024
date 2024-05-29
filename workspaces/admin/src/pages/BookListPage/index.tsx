@@ -64,6 +64,24 @@ type BookModalAction = {
   openDetail: (bookId: string) => void;
 };
 
+const useModalStore = create<BookModalState & BookModalAction>()((set) => ({
+  ...{
+    mode: BookModalMode.None,
+    params: {},
+  },
+  ...{
+    close() {
+      set({ mode: BookModalMode.None, params: {} });
+    },
+    openCreate() {
+      set({ mode: BookModalMode.Create, params: {} });
+    },
+    openDetail(bookId) {
+      set({ mode: BookModalMode.Detail, params: { bookId } });
+    },
+  },
+}))
+
 export const BookListPage: React.FC = () => {
   const bookListA11yId = useId();
 
@@ -108,26 +126,7 @@ export const BookListPage: React.FC = () => {
     updateQuery(formik.values.kind, formik.values.query);
   }, 250, [updateQuery, formik.values.query]);
 
-  const [useModalStore] = useState(() => {
-    return create<BookModalState & BookModalAction>()((set) => ({
-      ...{
-        mode: BookModalMode.None,
-        params: {},
-      },
-      ...{
-        close() {
-          set({ mode: BookModalMode.None, params: {} });
-        },
-        openCreate() {
-          set({ mode: BookModalMode.Create, params: {} });
-        },
-        openDetail(bookId) {
-          set({ mode: BookModalMode.Detail, params: { bookId } });
-        },
-      },
-    }));
-  });
-  const modalState = useModalStore();
+  const modalState = useModalStore()
 
   return (
     <>
