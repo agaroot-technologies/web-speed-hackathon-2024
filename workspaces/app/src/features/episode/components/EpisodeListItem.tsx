@@ -9,7 +9,7 @@ import { Spacer } from '../../../foundation/components/Spacer';
 import { Text } from '../../../foundation/components/Text';
 import { Color, Radius, Space, Typography } from '../../../foundation/styles/variables';
 import { getImageSrc } from '../../../lib/image/getImageSrc';
-import { useEpisode } from '../hooks/useEpisode';
+import { GetEpisodeListResponse } from '@wsh-2024/schema/src/api/episodes/GetEpisodeListResponse';
 
 const _Wrapper = styled.li`
   width: 100%;
@@ -29,12 +29,10 @@ const _ImgWrapper = styled.div`
 
 type Props = {
   bookId: string;
-  episodeId: string;
+  episode: GetEpisodeListResponse[number];
 };
 
-export const EpisodeListItem: React.FC<Props> = ({ bookId, episodeId }) => {
-  const { data: episode } = useEpisode({ params: { episodeId } });
-
+export const EpisodeListItem: React.FC<Props> = ({ bookId, episode }) => {
   return (
     <_Wrapper>
       <_Link href={`/books/${bookId}/episodes/${episode.id}`}>

@@ -88,6 +88,15 @@ class EpisodeRepository implements EpisodeRepositoryInterface {
           chapter: true,
           id: true,
           name: true,
+          description: true,
+        },
+        with: {
+          image: {
+            columns: {
+              alt: true,
+              id: true,
+            },
+          },
         },
         limit: options.query.limit,
         offset: options.query.offset,
