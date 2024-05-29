@@ -2,19 +2,19 @@ import fs from 'node:fs/promises';
 
 import { Hono } from 'hono';
 
-import { INDEX_HTML_PATH } from '../../constants/paths';
+import { ADMIN_INDEX_HTML_PATH } from '../../constants/paths';
 import { cacheControlMiddleware } from '../../middlewares/cacheControlMiddleware';
 
 const app = new Hono();
 app.use(cacheControlMiddleware);
 
 app.get('/admin', async (c) => {
-  const html = await fs.readFile(INDEX_HTML_PATH, 'utf-8');
+  const html = await fs.readFile(ADMIN_INDEX_HTML_PATH, 'utf-8');
   return c.html(html);
 });
 
 app.get('/admin/*', async (c) => {
-  const html = await fs.readFile(INDEX_HTML_PATH, 'utf-8');
+  const html = await fs.readFile(ADMIN_INDEX_HTML_PATH, 'utf-8');
   return c.html(html);
 });
 
