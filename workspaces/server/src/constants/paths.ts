@@ -8,7 +8,7 @@ const PACKAGE_DIR = findPackageDir.sync()!;
 
 export const DATABASE_PATH = path.resolve(PACKAGE_DIR, './dist/database.sqlite');
 
-export const DATABASE_SEED_PATH = path.resolve(PACKAGE_DIR, './seeds/database.sqlite');
+export const DATABASE_SEED_PATH = path.resolve(PACKAGE_DIR, './seeds/database.sqlite.gz');
 
 export const IMAGES_PATH = path.resolve(PACKAGE_DIR, './dist/images');
 
