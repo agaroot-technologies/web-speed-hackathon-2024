@@ -8,7 +8,7 @@ import type { DomainSpecificApiClientInterface } from '../../../lib/api/DomainSp
 import { apiClient } from '../../../lib/api/apiClient';
 
 type ReleaseApiClient = DomainSpecificApiClientInterface<{
-  fetch: [{ params: GetReleaseRequestParams, query: GetReleaseRequestQuery }, GetReleaseResponse];
+  fetch: [{ params: GetReleaseRequestParams, query?: GetReleaseRequestQuery }, GetReleaseResponse];
 }>;
 
 export const releaseApiClient: ReleaseApiClient = {
