@@ -1,5 +1,5 @@
-import { Suspense, useEffect, useState } from 'react';
-import { useInterval, useUpdate } from 'react-use';
+import { Suspense, useEffect, useMemo, useState } from 'react';
+import { useMeasure } from 'react-use';
 import styled from 'styled-components';
 
 import { addUnitIfNeeded } from '../../../lib/css/addUnitIfNeeded';
@@ -99,29 +99,30 @@ type Props = {
 };
 
 const ComicViewerCore: React.FC<Props> = ({ episodeId }) => {
-  // 画面のリサイズに合わせて再描画する
-  const rerender = useUpdate();
-  useInterval(rerender, 0);
+  const [containerRef, { height, width }] = useMeasure<HTMLDivElement>();
+
+  const { pageCountParView, pageWidth, viewerPaddingInline } = useMemo(() => {
+    // コンテナの幅
+    const cqw = width / 100;
+    // コンテナの高さ
+    const cqh = height / 100;
+
+    // 1画面に表示できるページ数（1 or 2）
+    const pageCountParView = (100 * cqw) / (100 * cqh) < (2 * IMAGE_WIDTH) / IMAGE_HEIGHT ? 1 : 2;
+    // ページの幅
+    const pageWidth = ((100 * cqh) / IMAGE_HEIGHT) * IMAGE_WIDTH;
+    // 画面にページを表示したときに余る左右の余白
+    const viewerPaddingInline =
+      (100 * cqw - pageWidth * pageCountParView) / 2 +
+      // 2ページ表示のときは、奇数ページが左側にあるべきなので、ページの最初と最後に1ページの余白をいれる
+      (pageCountParView === 2 ? pageWidth : 0);
+
+    return { pageCountParView, pageWidth, viewerPaddingInline };
+  }, [width, height]);
 
   const { data: episode } = useEpisode({ params: { episodeId } });
 
-  const [container, containerRef] = useState<HTMLDivElement | null>(null);
   const [scrollView, scrollViewRef] = useState<HTMLDivElement | null>(null);
-
-  // コンテナの幅
-  const cqw = (container?.getBoundingClientRect().width ?? 0) / 100;
-  // コンテナの高さ
-  const cqh = (container?.getBoundingClientRect().height ?? 0) / 100;
-
-  // 1画面に表示できるページ数（1 or 2）
-  const pageCountParView = (100 * cqw) / (100 * cqh) < (2 * IMAGE_WIDTH) / IMAGE_HEIGHT ? 1 : 2;
-  // ページの幅
-  const pageWidth = ((100 * cqh) / IMAGE_HEIGHT) * IMAGE_WIDTH;
-  // 画面にページを表示したときに余る左右の余白
-  const viewerPaddingInline =
-    (100 * cqw - pageWidth * pageCountParView) / 2 +
-    // 2ページ表示のときは、奇数ページが左側にあるべきなので、ページの最初と最後に1ページの余白をいれる
-    (pageCountParView === 2 ? pageWidth : 0);
 
   useEffect(() => {
     const abortController = new AbortController();
