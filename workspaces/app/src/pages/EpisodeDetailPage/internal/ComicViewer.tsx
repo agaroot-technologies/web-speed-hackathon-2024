@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useInterval, useUpdate } from 'react-use';
+import { useMemo } from 'react';
+import { useMeasure } from 'react-use';
 import styled from 'styled-components';
 
 import { ComicViewerCore } from '../../../features/viewer/components/ComicViewerCore';
@@ -32,23 +32,21 @@ type Props = {
 };
 
 export const ComicViewer: React.FC<Props> = ({ episodeId }) => {
-  // 画面のリサイズに合わせて再描画する
-  const rerender = useUpdate();
-  useInterval(rerender, 0);
+  const [ref, { width }] = useMeasure<HTMLDivElement>();
 
-  const [el, ref] = useState<HTMLDivElement | null>(null);
+  const viewerHeight = useMemo(() => {
+    // コンテナの幅
+    const cqw = width / 100;
 
-  // コンテナの幅
-  const cqw = (el?.getBoundingClientRect().width ?? 0) / 100;
-
-  // 1画面に表示できるページ数（1 or 2）
-  const pageCountParView = 100 * cqw <= 2 * MIN_PAGE_WIDTH ? 1 : 2;
-  // 1ページの幅の候補
-  const candidatePageWidth = (100 * cqw) / pageCountParView;
-  // 1ページの高さの候補
-  const candidatePageHeight = (candidatePageWidth / IMAGE_WIDTH) * IMAGE_HEIGHT;
-  // ビュアーの高さ
-  const viewerHeight = Math.min(Math.max(candidatePageHeight, MIN_VIEWER_HEIGHT), MAX_VIEWER_HEIGHT)
+    // 1画面に表示できるページ数（1 or 2）
+    const pageCountParView = 100 * cqw <= 2 * MIN_PAGE_WIDTH ? 1 : 2;
+    // 1ページの幅の候補
+    const candidatePageWidth = (100 * cqw) / pageCountParView;
+    // 1ページの高さの候補
+    const candidatePageHeight = (candidatePageWidth / IMAGE_WIDTH) * IMAGE_HEIGHT;
+    // ビュアーの高さ
+    return Math.min(Math.max(candidatePageHeight, MIN_VIEWER_HEIGHT), MAX_VIEWER_HEIGHT);
+  }, [width]);
 
   return (
     <_Container ref={ref}>
