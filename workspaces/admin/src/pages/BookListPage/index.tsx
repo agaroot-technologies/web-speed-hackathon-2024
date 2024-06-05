@@ -18,13 +18,14 @@ import {
   Tr,
 } from '@chakra-ui/react';
 import { useFormik } from 'formik';
-import { useCallback, useEffect, useId, useState } from 'react';
+import { Fragment, useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useDebounce } from 'react-use';
 import { create } from 'zustand';
 
 import type { GetBookListRequestQuery } from '@wsh-2024/schema/src/api/books/GetBookListRequestQuery';
 
 import { useBookList } from '../../features/books/hooks/useBookList';
+import { useInViewPort } from '../../foundation/hooks/useInViewPort';
 
 import { BookDetailModal } from './internal/BookDetailModal';
 import { CreateBookModal } from './internal/CreateBookModal';
@@ -94,7 +95,14 @@ export const BookListPage: React.FC = () => {
   });
 
   const [query, setQuery] = useState<GetBookListRequestQuery>({});
-  const { data: bookList = [] } = useBookList(query);
+  const { data: bookList, fetchNextPage, hasNextPage, status } = useBookList(query);
+
+  const anchorRef = useRef<HTMLDivElement>(null);
+  useInViewPort(anchorRef, async entry => {
+    if (!entry.isIntersecting) return;
+
+    if (hasNextPage) fetchNextPage()
+  });
 
   const updateQuery = useCallback((kind: BookSearchKind, query: string) => {
     if (!query) {
@@ -216,26 +224,32 @@ export const BookListPage: React.FC = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {bookList.map((book) => (
-                  <Tr key={book.id}>
-                    <Td textAlign="center" verticalAlign="middle">
-                      <Button colorScheme="teal" onClick={() => modalState.openDetail(book.id)} variant="solid">
-                        詳細
-                      </Button>
-                    </Td>
-                    <Td verticalAlign="middle">
-                      <Text fontWeight="bold">{book.name}</Text>
-                      <Text color="gray.400" fontSize="small">
-                        {book.id}
-                      </Text>
-                    </Td>
-                    <Td verticalAlign="middle">
-                      <Text fontWeight="bold">{book.author.name}</Text>
-                      <Text color="gray.400" fontSize="small">
-                        {book.author.id}
-                      </Text>
-                    </Td>
-                  </Tr>
+
+                {status === 'success' && bookList.pages.map((group, index) => (
+                  <Fragment key={index}>
+                    {group.map(book => (
+                      <Tr key={book.id}>
+                        <Td textAlign="center" verticalAlign="middle">
+                          <Button colorScheme="teal" onClick={() => modalState.openDetail(book.id)} variant="solid">
+                            詳細
+                          </Button>
+                        </Td>
+                        <Td verticalAlign="middle">
+                          <Text fontWeight="bold">{book.name}</Text>
+                          <Text color="gray.400" fontSize="small">
+                            {book.id}
+                          </Text>
+                        </Td>
+                        <Td verticalAlign="middle">
+                          <Text fontWeight="bold">{book.author.name}</Text>
+                          <Text color="gray.400" fontSize="small">
+                            {book.author.id}
+                          </Text>
+                        </Td>
+                      </Tr>
+                    ))}
+                    <div ref={anchorRef} style={{ minHeight: '100%', minWidth: '1px', opacity: 0 }} />
+                  </Fragment>
                 ))}
               </Tbody>
             </Table>
