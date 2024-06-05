@@ -91,7 +91,6 @@ class BookRepository implements BookRepositoryInterface {
           author: {
             id: author.id,
             name: author.name,
-            
           },
           description: book.description,
           id: book.id,
@@ -115,7 +114,7 @@ class BookRepository implements BookRepositoryInterface {
         )
         .$dynamic();
 
-      const results = await (() => {
+      const filteredQuery = (() => {
         if (options.query.authorId != null) {
           return baseQuery.where(eq(book.authorId, options.query.authorId))
         }
@@ -134,7 +133,11 @@ class BookRepository implements BookRepositoryInterface {
         return baseQuery;
       })();
 
-      return ok(results);
+      const paginatedQuery = (options.query.offset != null && options.query.limit != null)
+        ? filteredQuery.limit(options.query.limit).offset(options.query.offset)
+        : filteredQuery;
+
+      return ok(await paginatedQuery.execute());
     } catch (cause) {
       if (cause instanceof HTTPException) {
         return err(cause);
