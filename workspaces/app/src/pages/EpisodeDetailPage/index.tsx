@@ -4,13 +4,13 @@ import type { RouteParams } from 'regexparam';
 import invariant from 'tiny-invariant';
 
 import { EpisodeListItem } from '../../features/episode/components/EpisodeListItem';
+import { useEpisodeList } from '../../features/episode/hooks/useEpisodeList';
 import { Box } from '../../foundation/components/Box';
 import { Flex } from '../../foundation/components/Flex';
 import { Separator } from '../../foundation/components/Separator';
 import { Space } from '../../foundation/styles/variables';
 
 import { ComicViewer } from './internal/ComicViewer';
-import { useEpisodeList } from '../../features/episode/hooks/useEpisodeList';
 
 const EpisodeDetailPage: React.FC = () => {
   const { bookId, episodeId } = useParams<RouteParams<'/books/:bookId/episodes/:episodeId'>>();
