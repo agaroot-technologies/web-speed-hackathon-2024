@@ -25,7 +25,7 @@ const RankingList: FC = () => {
   });
 
   return (
-    <Flex align="center" as="ul" direction="column" justify="center">
+    <Flex align="center" as="ul" direction="column" height={775} justify="flex-start" overflow='auto'>
       {rankingList.map((ranking) => (
         <RankingCard key={ranking.id} book={ranking.book} />
       ))}
