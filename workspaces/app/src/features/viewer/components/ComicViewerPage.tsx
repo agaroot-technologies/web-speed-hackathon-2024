@@ -6,11 +6,25 @@ import { decrypt } from '@wsh-2024/image-encrypt/src/decrypt';
 
 import { getImageUrl } from '../../../lib/image/getImageUrl';
 
+const IMAGE_WIDTH = 1075;
+const IMAGE_HEIGHT = 1518;
+
 const _Canvas = styled.canvas`
   height: 100%;
   width: auto;
   flex-grow: 0;
   flex-shrink: 0;
+  scroll-snap-align: center;
+  aspect-ratio: ${IMAGE_WIDTH} / ${IMAGE_HEIGHT};
+
+  @container (aspect-ratio >= ${IMAGE_WIDTH * 2} / ${IMAGE_HEIGHT}) {
+    &:nth-child(2n+1) {
+      scroll-margin-right: calc((100cqh / ${IMAGE_HEIGHT}) * ${IMAGE_WIDTH});
+    }
+    &:nth-child(2n) {
+      scroll-margin-left: calc((100cqh / ${IMAGE_HEIGHT}) * ${IMAGE_WIDTH});
+    }
+  }
 `;
 
 type Props = {

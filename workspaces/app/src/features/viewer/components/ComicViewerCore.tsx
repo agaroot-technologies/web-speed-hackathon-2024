@@ -1,8 +1,6 @@
-import { Suspense, useEffect, useMemo, useState } from 'react';
-import { useMeasure } from 'react-use';
+import { Suspense, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
-import { addUnitIfNeeded } from '../../../lib/css/addUnitIfNeeded';
 import { useEpisode } from '../../episode/hooks/useEpisode';
 
 import { ComicViewerPage } from './ComicViewerPage';
@@ -10,84 +8,36 @@ import { ComicViewerPage } from './ComicViewerPage';
 const IMAGE_WIDTH = 1075;
 const IMAGE_HEIGHT = 1518;
 
-/** スクロールスナップで適切な位置になるための X 軸の移動距離を計算する */
-function getScrollToLeft({
-  pageCountParView,
-  pageWidth,
-  scrollView,
-}: {
-  pageCountParView: number;
-  pageWidth: number;
-  scrollView: HTMLDivElement;
-}) {
-  const scrollViewClientRect = scrollView.getBoundingClientRect();
-  const scrollViewCenterX = (scrollViewClientRect.left + scrollViewClientRect.right) / 2;
-
-  const children = [...scrollView.children] as HTMLDivElement[];
-
-  let scrollToLeft = Number.MAX_SAFE_INTEGER;
-
-  // 画面に表示されているページの中心と、スクロールビューの中心との差分を計算する
-  for (const [idx, child] of children.entries()) {
-    const nthChild = idx + 1;
-    const elementClientRect = child.getBoundingClientRect();
-
-    // 見開き2ページの場合は、scroll-margin で表示領域にサイズを合わせる
-    const scrollMargin =
-      pageCountParView === 2
-        ? {
-            // 奇数ページのときは左側に1ページ分の幅を追加する
-            left: nthChild % 2 === 0 ? pageWidth : 0,
-            // 偶数ページのときは右側に1ページ分の幅を追加する
-            right: nthChild % 2 === 1 ? pageWidth : 0,
-          }
-        : { left: 0, right: 0 };
-
-    // scroll-margin の分だけ広げた範囲を計算する
-    const areaClientRect = {
-      bottom: elementClientRect.bottom,
-      left: elementClientRect.left - scrollMargin.left,
-      right: elementClientRect.right + scrollMargin.right,
-      top: elementClientRect.top,
-    };
-
-    const areaCenterX = (areaClientRect.left + areaClientRect.right) / 2;
-    // ページの中心をスクロールビューの中心に合わせるための移動距離
-    const candidateScrollToLeft = areaCenterX - scrollViewCenterX;
-
-    // もっともスクロール量の少ないものを選ぶ
-    if (Math.abs(candidateScrollToLeft) < Math.abs(scrollToLeft)) {
-      scrollToLeft = candidateScrollToLeft;
-    }
-  }
-
-  return scrollToLeft;
-}
-
 const _Container = styled.div`
   position: relative;
+  container-type: size;
 `;
 
-const _Wrapper = styled.div<{
-  $paddingInline: number;
-  $pageWidth: number;
-}>`
+const _Wrapper = styled.div`
+  --page-width: calc((100cqh / ${IMAGE_HEIGHT}) * ${IMAGE_WIDTH});
+  --padding-inline: calc((100cqw - var(--page-width)) / 2);
+
   background-color: black;
   cursor: grab;
   direction: rtl;
   display: grid;
-  grid-auto-columns: ${({ $pageWidth }) => addUnitIfNeeded($pageWidth)};
+  grid-auto-columns: var(--page-width);
   grid-auto-flow: column;
   grid-template-rows: minmax(auto, 100%);
   height: 100%;
   overflow-x: scroll;
   overflow-y: hidden;
   overscroll-behavior: none;
-  padding-inline: ${({ $paddingInline }) => addUnitIfNeeded($paddingInline)};
+  padding-inline: var(--padding-inline);
   touch-action: none;
+  scroll-snap-type: x mandatory;
 
   &::-webkit-scrollbar {
     display: none;
+  }
+
+  @container (aspect-ratio >= ${IMAGE_WIDTH * 2} / ${IMAGE_HEIGHT}) {
+    --padding-inline: calc((100cqw - var(--page-width) * 2) / 2 + var(--page-width));
   }
 `;
 
@@ -96,43 +46,22 @@ type Props = {
 };
 
 const ComicViewerCore: React.FC<Props> = ({ episodeId }) => {
-  const [containerRef, { height, width }] = useMeasure<HTMLDivElement>();
-
-  const { pageCountParView, pageWidth, viewerPaddingInline } = useMemo(() => {
-    // コンテナの幅
-    const cqw = width / 100;
-    // コンテナの高さ
-    const cqh = height / 100;
-
-    // 1画面に表示できるページ数（1 or 2）
-    const pageCountParView = (100 * cqw) / (100 * cqh) < (2 * IMAGE_WIDTH) / IMAGE_HEIGHT ? 1 : 2;
-    // ページの幅
-    const pageWidth = ((100 * cqh) / IMAGE_HEIGHT) * IMAGE_WIDTH;
-    // 画面にページを表示したときに余る左右の余白
-    const viewerPaddingInline =
-      (100 * cqw - pageWidth * pageCountParView) / 2 +
-      // 2ページ表示のときは、奇数ページが左側にあるべきなので、ページの最初と最後に1ページの余白をいれる
-      (pageCountParView === 2 ? pageWidth : 0);
-
-    return { pageCountParView, pageWidth, viewerPaddingInline };
-  }, [width, height]);
-
   const { data: episode } = useEpisode({ params: { episodeId } });
 
-  const [scrollView, scrollViewRef] = useState<HTMLDivElement | null>(null);
+  const scrollViewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const abortController = new AbortController();
+    const scrollView = scrollViewRef.current;
+    if (!scrollView) return;
 
     let isPressed = false;
-    let scrollToLeftWhenScrollEnd = 0;
 
     const handlePointerDown = (ev: PointerEvent) => {
       const scrollView = ev.currentTarget as HTMLDivElement;
       isPressed = true;
       scrollView.style.cursor = 'grabbing';
+      scrollView.style.scrollSnapType = 'none';
       scrollView.setPointerCapture(ev.pointerId);
-      scrollToLeftWhenScrollEnd = getScrollToLeft({ pageCountParView, pageWidth, scrollView });
     };
 
     const handlePointerMove = (ev: PointerEvent) => {
@@ -142,7 +71,6 @@ const ComicViewerCore: React.FC<Props> = ({ episodeId }) => {
           behavior: 'instant',
           left: -1 * ev.movementX,
         });
-        scrollToLeftWhenScrollEnd = getScrollToLeft({ pageCountParView, pageWidth, scrollView });
       }
     };
 
@@ -150,64 +78,24 @@ const ComicViewerCore: React.FC<Props> = ({ episodeId }) => {
       const scrollView = ev.currentTarget as HTMLDivElement;
       isPressed = false;
       scrollView.style.cursor = 'grab';
+      scrollView.style.scrollSnapType = 'x mandatory';
       scrollView.releasePointerCapture(ev.pointerId);
-      scrollToLeftWhenScrollEnd = getScrollToLeft({ pageCountParView, pageWidth, scrollView });
     };
 
-    const handleScroll = (ev: Pick<Event, 'currentTarget'>) => {
-      const scrollView = ev.currentTarget as HTMLDivElement;
-      scrollToLeftWhenScrollEnd = getScrollToLeft({ pageCountParView, pageWidth, scrollView });
-    };
-
-    let scrollEndTimer = -1;
-    abortController.signal.addEventListener('abort', () => window.clearTimeout(scrollEndTimer), { once: true });
-
-    const handleScrollEnd = (ev: Pick<Event, 'currentTarget'>) => {
-      const scrollView = ev.currentTarget as HTMLDivElement;
-
-      // マウスが離されるまではスクロール中とみなす
-      if (isPressed) {
-        scrollEndTimer = window.setTimeout(() => handleScrollEnd({ currentTarget: scrollView }), 0);
-        return;
-      } else {
-        scrollView.scrollBy({
-          behavior: 'smooth',
-          left: scrollToLeftWhenScrollEnd,
-        });
-      }
-    };
-
-    let prevContentRect: DOMRectReadOnly | null = null;
-    const handleResize = (entries: ResizeObserverEntry[]) => {
-      if (prevContentRect != null && prevContentRect.width !== entries[0]?.contentRect.width) {
-        requestAnimationFrame(() => {
-          scrollView?.scrollBy({
-            behavior: 'instant',
-            left: getScrollToLeft({ pageCountParView, pageWidth, scrollView }),
-          });
-        });
-      }
-      prevContentRect = entries[0]?.contentRect ?? null;
-    };
-
-    scrollView?.addEventListener('pointerdown', handlePointerDown, { passive: true, signal: abortController.signal });
-    scrollView?.addEventListener('pointermove', handlePointerMove, { passive: true, signal: abortController.signal });
-    scrollView?.addEventListener('pointerup', handlePointerUp, { passive: true, signal: abortController.signal });
-    scrollView?.addEventListener('scroll', handleScroll, { passive: true, signal: abortController.signal });
-    scrollView?.addEventListener('scrollend', handleScrollEnd, { passive: true, signal: abortController.signal });
-
-    const resizeObserver = new ResizeObserver(handleResize);
-    scrollView && resizeObserver.observe(scrollView);
-    abortController.signal.addEventListener('abort', () => resizeObserver.disconnect(), { once: true });
+    scrollView.addEventListener('pointerdown', handlePointerDown, { passive: true });
+    scrollView.addEventListener('pointermove', handlePointerMove, { passive: true });
+    scrollView.addEventListener('pointerup', handlePointerUp, { passive: true });
 
     return () => {
-      abortController.abort();
+      scrollView.removeEventListener('pointerdown', handlePointerDown);
+      scrollView.removeEventListener('pointermove', handlePointerMove);
+      scrollView.removeEventListener('pointerup', handlePointerUp);
     };
-  }, [pageCountParView, pageWidth, scrollView]);
+  });
 
   return (
-    <_Container ref={containerRef}>
-      <_Wrapper ref={scrollViewRef} $paddingInline={viewerPaddingInline} $pageWidth={pageWidth}>
+    <_Container>
+      <_Wrapper ref={scrollViewRef}>
         {episode.pages.map((page) => {
           return <ComicViewerPage key={page.id} pageImageId={page.image.id} />;
         })}
