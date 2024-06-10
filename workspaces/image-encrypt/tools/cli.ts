@@ -9,10 +9,8 @@ import { encrypt } from '../src/encrypt';
 
 import { createCanvasContext } from './createCavnasContext';
 import { createImageFromImageData } from './createImageFromImageData';
-import { readJpegXL } from './reader/readJpegXL';
-import { readPng } from './reader/readPng';
-import { writeJpegXL } from './writer/writeJpegXL';
-import { writePng } from './writer/writePng';
+import { readWebp } from './reader/readWebp';
+import { writeWebp } from './writer/writeWebp';
 
 const program = new Command();
 
@@ -25,7 +23,7 @@ program
       format: '[{bar}] {percentage}% | ETA: {eta}s | {value}/{total} | {filename}',
     });
 
-    const imagePathList = await globby('**/*.png', {
+    const imagePathList = await globby('**/*.webp', {
       absolute: true,
       cwd: path.resolve(process.cwd(), inputDirectory),
     });
@@ -37,7 +35,7 @@ program
         filename: path.basename(sourceImagePath),
       });
 
-      const sourceImageData = await readPng(sourceImagePath);
+      const sourceImageData = await readWebp(sourceImagePath);
 
       const sourceImage = await createImageFromImageData(sourceImageData);
       const exportCanvasContext = await createCanvasContext({
@@ -58,9 +56,9 @@ program
       const exportImagePath = path.resolve(
         outputDirectory,
         path.dirname(path.relative(inputDirectory, sourceImagePath)),
-        path.parse(sourceImagePath).name + '.jxl',
+        path.parse(sourceImagePath).name + '.webp',
       );
-      await writeJpegXL({ filepath: exportImagePath, imageData: exportImageData });
+      await writeWebp({ filepath: exportImagePath, imageData: exportImageData });
 
       progress.increment();
     }
@@ -77,7 +75,7 @@ program
       format: '[{bar}] {percentage}% | ETA: {eta}s | {value}/{total} | {filename}',
     });
 
-    const imagePathList = await globby('**/*.jxl', {
+    const imagePathList = await globby('**/*.webp', {
       absolute: true,
       cwd: path.resolve(process.cwd(), inputDirectory),
     });
@@ -89,7 +87,7 @@ program
         filename: path.basename(sourceImagePath),
       });
 
-      const sourceImageData = await readJpegXL(sourceImagePath);
+      const sourceImageData = await readWebp(sourceImagePath);
 
       const sourceImage = await createImageFromImageData(sourceImageData);
       const exportCanvasContext = await createCanvasContext({
@@ -110,9 +108,9 @@ program
       const exportImagePath = path.resolve(
         outputDirectory,
         path.dirname(path.relative(inputDirectory, sourceImagePath)),
-        path.parse(sourceImagePath).name + '.png',
+        path.parse(sourceImagePath).name + '.webp',
       );
-      await writePng({ filepath: exportImagePath, imageData: exportImageData });
+      await writeWebp({ filepath: exportImagePath, imageData: exportImageData });
 
       progress.increment();
     }
