@@ -30,6 +30,10 @@ module.exports = {
     'react/jsx-uses-react': 'off',
     'react/prop-types': ['off'],
     'react/react-in-jsx-scope': 'off',
+    'sort/destructuring-properties': 'off',
+    'sort/import-members': 'off',
+    'sort/object-properties': 'off',
+    'sort/type-properties': 'off',
   },
   settings: {
     react: {
