@@ -1,10 +1,10 @@
 import { Close } from '@mui/icons-material'
+import { useState } from 'react';
 import styled from 'styled-components';
 
 import { Color, Space } from '../styles/variables';
 
 import { Button } from './Button';
-import { useState } from 'react';
 
 const _Overlay = styled.div`
   position: fixed;
@@ -62,7 +62,7 @@ export const Dialog: React.FC<{
   }
 
   const handleClose = () => {
-    document.body.style.overflow = 'scroll'
+    document.body.style.overflow = 'initial';
     setOpen(false)
   }
 
