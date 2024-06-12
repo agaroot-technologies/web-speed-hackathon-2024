@@ -22,7 +22,6 @@ app.use(
     origin: (origin) => origin,
   }),
 );
-app.use(compress());
 
 app.get('/healthz', (c) => {
   return c.body('live', 200);
