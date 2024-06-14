@@ -39,9 +39,11 @@ export const DialogContent: FC<DialogContentProps> = ({
         {title}
       </Text>
       <Spacer height={Space * 1} />
-      <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-        {content}
-      </Text>
+      {content && (
+        <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
+          {content}
+        </Text>
+      )}
     </_Content>
   )
 }

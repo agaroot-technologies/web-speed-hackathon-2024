@@ -45,6 +45,21 @@ class AuthorRepository implements AuthorRepositoryInterface {
           return eq(author.id, options.params.authorId);
         },
         with: {
+          books: {
+            columns: {
+              description: true,
+              id: true,
+              name: true,
+            },
+            with: {
+              image: {
+                columns: {
+                  alt: true,
+                  id: true,
+                },
+              },
+            }
+          },
           image: {
             columns: {
               alt: true,
@@ -70,7 +85,6 @@ class AuthorRepository implements AuthorRepositoryInterface {
     try {
       const data = await getDatabase().query.author.findMany({
         columns: {
-          description: true,
           id: true,
           name: true,
         },

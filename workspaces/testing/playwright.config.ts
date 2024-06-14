@@ -10,7 +10,7 @@ export default defineConfig({
     },
   },
   forbidOnly: !!process.env['FORBID_ONLY'],
-  fullyParallel: true,
+  fullyParallel: false,
   projects: [
     {
       name: 'Mobile Chrome',
