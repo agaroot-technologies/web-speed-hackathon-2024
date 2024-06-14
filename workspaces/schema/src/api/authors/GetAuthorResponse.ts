@@ -1,7 +1,7 @@
 import { createSelectSchema } from 'drizzle-zod';
 import type { z } from 'zod';
 
-import { author, book, episode, image } from '../../models';
+import { author, book, image } from '../../models';
 
 export const GetAuthorResponseSchema = createSelectSchema(author)
   .pick({
@@ -15,22 +15,11 @@ export const GetAuthorResponseSchema = createSelectSchema(author)
         description: true,
         id: true,
         name: true,
-      })
-      .extend({
-        episodes: createSelectSchema(episode)
-          .pick({
-            chapter: true,
-            description: true,
-            id: true,
-            name: true,
-          })
-          .array(),
         image: createSelectSchema(image).pick({
           alt: true,
           id: true,
         }),
-      })
-      .array(),
+      }).array(),
     image: createSelectSchema(image).pick({
       alt: true,
       id: true,
