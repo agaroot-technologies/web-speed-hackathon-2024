@@ -79,7 +79,7 @@ test.describe('作者一覧', () => {
     }
   });
 
-  test.describe.only('作者編集モーダル', () => {
+  test.describe('作者編集モーダル', () => {
     test.beforeEach(async ({ page }) => {
       // Given: 作者 ID で絞り込みが行われている状態
       const searchbox = page.getByRole('textbox', { name: '条件を入力' });
