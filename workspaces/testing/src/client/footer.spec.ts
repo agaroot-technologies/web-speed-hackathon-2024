@@ -2,9 +2,9 @@ import { webcrypto } from 'node:crypto';
 
 import { expect, test } from '@playwright/test';
 
-const BOOK_ID = '6e5175b6-7724-4872-9d99-c3cd372a8860';
-const EPISODE_ID = '3f919940-2392-4434-9095-a338868cf567';
-const AUTHOR_ID = 'b0887a9d-3913-42f3-a574-e9c51579a669';
+const BOOK_ID = 'cf6552c4-a713-468d-ab76-9cabb51e62ac';
+const EPISODE_ID = '4a9f9923-cac7-4206-aba7-fbe5e28eb593';
+const AUTHOR_ID = '2ab0aca5-7dc2-4543-ac98-e23fdaca0739';
 const pages = [
   { name: 'トップページ', path: '/' },
   { name: '作者ページ', path: `/authors/${AUTHOR_ID}` },
