@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 import { err, ok } from 'neverthrow';
 import type { Result } from 'neverthrow';
+import { toKatakana } from 'wanakana';
 
 import type { DeleteAuthorRequestParams } from '@wsh-2024/schema/src/api/authors/DeleteAuthorRequestParams';
 import type { DeleteAuthorResponse } from '@wsh-2024/schema/src/api/authors/DeleteAuthorResponse';
@@ -95,7 +96,7 @@ class AuthorRepository implements AuthorRepositoryInterface {
             return eq(author.id, options.query.authorId);
           }
           if (options.query.name != null) {
-            return like(author.name, `%${options.query.name}%`);
+            return like(author.name, `%${toKatakana(options.query.name, { passRomaji: true })}%`);
           }
           return;
         },
