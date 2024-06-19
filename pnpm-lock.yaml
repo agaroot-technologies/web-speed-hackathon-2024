@@ -311,6 +311,9 @@ importers:
       styled-components:
         specifier: 6.1.1
         version: 6.1.1(react-dom@18.2.0)(react@18.2.0)
+      wanakana:
+        specifier: 5.3.1
+        version: 5.3.1
       zod:
         specifier: 3.22.4
         version: 3.22.4
@@ -8556,6 +8559,11 @@ packages:
       spdx-correct: 3.2.0
       spdx-expression-parse: 3.0.1
     dev: true
+
+  /wanakana@5.3.1:
+    resolution: {integrity: sha512-OSDqupzTlzl2LGyqTdhcXcl6ezMiFhcUwLBP8YKaBIbMYW1wAwDvupw2T9G9oVaKT9RmaSpyTXjxddFPUcFFIw==}
+    engines: {node: '>=12'}
+    dev: false
 
   /webidl-conversions@4.0.2:
     resolution: {integrity: sha512-YQ+BmxuTgd6UXZW3+ICGfyqRyHXVlD5GtQr5+qjiNW7bF0cqrzX500HVXPBOvgXb5YnzDd+h0zqyv61KUD7+Sg==}

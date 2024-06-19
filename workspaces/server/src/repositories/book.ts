@@ -2,6 +2,7 @@ import { eq, like, or } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 import { err, ok } from 'neverthrow';
 import type { Result } from 'neverthrow';
+import { toKatakana, toHiragana } from 'wanakana';
 
 import type { DeleteBookRequestParams } from '@wsh-2024/schema/src/api/books/DeleteBookRequestParams';
 import type { DeleteBookResponse } from '@wsh-2024/schema/src/api/books/DeleteBookResponse';
@@ -119,7 +120,7 @@ class BookRepository implements BookRepositoryInterface {
           return baseQuery.where(eq(book.authorId, options.query.authorId))
         }
         if (options.query.authorName != null) {
-          return baseQuery.where(like(author.name, `%${options.query.authorName}%`))
+          return baseQuery.where(like(author.name, `%${toKatakana(options.query.authorName, { passRomaji: true })}%`))
         }
         if (options.query.bookId != null) {
           return baseQuery.where(eq(book.id, options.query.bookId))
@@ -127,7 +128,7 @@ class BookRepository implements BookRepositoryInterface {
         if (options.query.name != null) {
           return baseQuery.where(or(
             like(book.name, `%${options.query.name}%`),
-            like(book.nameRuby, `%${options.query.name}%`)
+            like(book.nameRuby, `%${toHiragana(options.query.name, { passRomaji: true })}%`)
           ))
         }
         return baseQuery;
