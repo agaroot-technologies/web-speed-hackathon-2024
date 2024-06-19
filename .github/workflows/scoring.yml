@@ -32,7 +32,7 @@ jobs:
             Actions: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
   vrt:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     outputs:
       result: ${{ steps.result.outputs.result }}
     steps:
