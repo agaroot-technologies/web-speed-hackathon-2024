@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-const BOOK_ID = '6e5175b6-7724-4872-9d99-c3cd372a8860';
-const EPISODE_ID = '3f919940-2392-4434-9095-a338868cf567';
-const AUTHOR_ID = 'b0887a9d-3913-42f3-a574-e9c51579a669';
+const BOOK_ID = 'bf0fffef-517b-4969-9a2c-3adcfacac17e';
+const EPISODE_ID = 'c03dae65-2eee-4dbd-a796-0bc5dee54716';
+const AUTHOR_ID = '2ab0aca5-7dc2-4543-ac98-e23fdaca0739';
 
 const pages = [
   { name: '作者ページ', path: `/authors/${AUTHOR_ID}` },
