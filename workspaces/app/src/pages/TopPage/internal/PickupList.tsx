@@ -10,7 +10,7 @@ import { Text } from '../../../foundation/components/Text';
 import { useInViewPort } from '../../../foundation/hooks/useInViewPort';
 import { Color, Space, Typography } from '../../../foundation/styles/variables';
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 15;
 
 const PickupList: FC = () => {
   const { data, isValidating, setSize, size } = useFeatureList(PAGE_SIZE);
