@@ -71,12 +71,20 @@ jobs:
               status: 0 < errors.length ? 'failure' : 'success',
             };
 
-      - name: Upload result
+      - name: Upload result.json
         uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
         if: ${{ fromJSON(steps.result.outputs.result).status == 'failure' }}
         with:
-          name: test-result
+          name: result.json
           path: ./workspaces/testing/result.json
+          retention-days: 1
+
+      - name: Upload test results
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        if: ${{ fromJSON(steps.result.outputs.result).status == 'failure' }}
+        with:
+          name: test-results
+          path: ./workspaces/testing/test-results
           retention-days: 1
 
   comment-vrt:
