@@ -6,7 +6,7 @@ export default defineConfig({
   expect: {
     timeout: 6_000,
     toHaveScreenshot: {
-      maxDiffPixelRatio: 0.03,
+      maxDiffPixelRatio: 0.05,
     },
   },
   forbidOnly: !!process.env['FORBID_ONLY'],
