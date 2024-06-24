@@ -11,7 +11,7 @@ test.describe('サービストップ', () => {
     });
     await context.addInitScript(() => {
       // @ts-expect-error MockDate is defined by the above script.
-      MockDate.set(1711195200); // 2024-03-23T12:00:00.000Z
+      MockDate.set(1711195200); // 1970-01-21T19:19:55.000Z
     });
 
     // Given

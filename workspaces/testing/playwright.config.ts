@@ -31,5 +31,7 @@ export default defineConfig({
     baseURL: BASE_URL,
     headless: true,
     trace: 'off',
+    locale: 'ja-JP',
+    timezoneId: 'Asia/Tokyo',
   },
 });
