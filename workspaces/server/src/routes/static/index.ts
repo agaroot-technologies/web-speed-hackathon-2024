@@ -11,6 +11,12 @@ app.use(staticContentCacheMiddleware);
 
 app.use(
   '*',
+  async (c, next) => {
+    await next();
+    if (c.req.url.endsWith('.js')) {
+      c.res.headers.append('Content-Encoding', 'br')
+    }
+  },
   serveStatic({
     root: path.relative(process.cwd(), CLIENT_STATIC_PATH),
   }),

@@ -1,5 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import pipe from 'node:stream/promises';
+import { createBrotliCompress } from 'node:zlib';
 
 import { pnpmWorkspaceRoot as findWorkspaceDir } from '@node-kit/pnpm-workspace-root';
 import findPackageDir from 'pkg-dir';
@@ -47,7 +49,21 @@ export default defineConfig(async (): Promise<Options[]> => {
       platform: 'browser',
       shims: true,
       sourcemap: true,
-      target: ['chrome58', 'firefox57', 'safari11', 'edge18']
+      target: ['chrome58', 'firefox57', 'safari11', 'edge18'],
+      onSuccess: async () => {
+        const files = fs.readdirSync(OUTPUT_DIR);
+        files.forEach(async (file) => {
+          if (!file.endsWith('.js')) return;
+
+          await pipe.pipeline(
+            fs.createReadStream(path.resolve(OUTPUT_DIR, file)),
+            createBrotliCompress(),
+            fs.createWriteStream(path.resolve(OUTPUT_DIR, `${file}.br`)),
+          );
+          fs.rmSync(path.resolve(OUTPUT_DIR, file));
+          fs.renameSync(path.resolve(OUTPUT_DIR, `${file}.br`), path.resolve(OUTPUT_DIR, file));
+        });
+      },
     },
   ];
 });
