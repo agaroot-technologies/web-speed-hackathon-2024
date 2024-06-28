@@ -26,6 +26,9 @@ export const measureReadBook = async (baseUrl: string): Promise<MeasureResult> =
       await page.mouse.move(start.x + deltaX, 0, { steps: 3 });
       await page.mouse.up();
 
+      const secondImageUrl = new URL('/images/4a1f65c1-90a9-4c36-8287-ff57ff6be755.webp', baseUrl);
+      await page.waitForResponse(secondImageUrl.href);
+
       await flow.endTimespan();
     });
     console.log('Result:', result);
